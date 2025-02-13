@@ -63,7 +63,7 @@ export class BaseOpenAIAgent {
 
       const runner = this.client.beta.chat.completions
         .runTools({
-          model: 'gpt-4',
+          model: 'gpt-4o',
           tools: tools as AutoParseableTool<any, true>[],
           messages: [
             { role: 'system', content: this.config.systemPrompt },

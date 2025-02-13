@@ -1,10 +1,10 @@
 # AI Assistant with Tool Agents
 
-An extensible AI assistant powered by OpenAI's GPT-4 that integrates with Google Workspace and other services. Features a modular agent architecture for handling specialized tasks like calendar management, email, contacts, and more.
+An extensible AI assistant powered by OpenAI's GPT-4o that integrates with Google Workspace and other services. Features a modular agent architecture for handling specialized tasks like calendar management, email, contacts, and more.
 
 ## Features
 
-- 🤖 GPT-4 powered personal assistant
+- 🤖 GPT-4o powered personal assistant
 - 📅 Google Calendar integration
 - 📧 Gmail integration
 - 👥 Google Contacts management
