@@ -5,6 +5,11 @@ An extensible AI assistant powered by OpenAI's GPT-4o that integrates with Googl
 ## Features
 
 - 🤖 GPT-4o powered personal assistant
+- 💬 Rich Telegram interface with:
+  - Text messaging
+  - Voice transcription
+  - Image analysis and OCR
+  - Document processing
 - 📅 Google Calendar integration
 - 📧 Gmail integration
 - 👥 Google Contacts management
@@ -13,7 +18,7 @@ An extensible AI assistant powered by OpenAI's GPT-4o that integrates with Googl
 - 🌤️ Weather information
 - 🔍 Internet search capabilities
 - ➗ Basic calculations
-- 💬 Multiple interfaces (Telegram bot & CLI)
+- CLI interface for testing
 
 ## Architecture
 
