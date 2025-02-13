@@ -151,6 +151,12 @@ pnpm run start
 - Precise numerical calculations
 - Error handling for invalid operations
 
+### File Management Agent
+- Safe file operations in a dedicated scratchpad directory
+- Basic operations: create, read, update, delete
+- Directory management and file organization
+- File search and metadata retrieval
+
 ## Contributing
 
 Contributions are welcome! The modular agent architecture makes it easy to add new capabilities:
