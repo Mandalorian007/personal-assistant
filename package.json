@@ -10,7 +10,9 @@
     "start": "tsx src/main.ts"
   },
   "dependencies": {
+    "@types/glob": "^8.1.0",
     "dotenv": "^16.4.7",
+    "glob": "^11.0.1",
     "google-auth-library": "^9.15.1",
     "googleapis": "^144.0.0",
     "node-telegram-bot-api": "^0.64.0",

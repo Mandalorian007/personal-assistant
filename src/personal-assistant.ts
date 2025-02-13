@@ -9,6 +9,7 @@ import { ContactsAgent } from './agents/contacts-agent.js';
 import { GmailAgent } from './agents/gmail-agent.js';
 import { InternetSearchAgent } from './agents/internet-search-agent.js';
 import { GoogleDocsAgent } from './agents/google-docs-agent.js';
+import { FileManagementAgent } from './agents/file-management-agent.js';
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -28,7 +29,8 @@ export class PersonalAssistant extends BaseOpenAIAgent {
       new ContactsAgent(client),
       new GmailAgent(client),
       new InternetSearchAgent(client),
-      new GoogleDocsAgent(client)
+      new GoogleDocsAgent(client),
+      new FileManagementAgent(client)
     ];
 
     const agentTools = agents.flatMap(agent => agent.getTools().map(tool => createTool(tool)));

@@ -9,6 +9,7 @@ An extensible AI assistant powered by OpenAI's GPT-4o that integrates with Googl
 - 📧 Gmail integration
 - 👥 Google Contacts management
 - 📝 Google Docs integration
+- 📁 File Management with scratchpad directory
 - 🌤️ Weather information
 - 🔍 Internet search capabilities
 - ➗ Basic calculations
