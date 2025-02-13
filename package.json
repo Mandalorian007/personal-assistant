@@ -1,0 +1,29 @@
+{
+  "name": "ai-assistant-project",
+  "version": "1.0.0",
+  "description": "AI Assistant with Tool Agents",
+  "main": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "setup-google-auth": "tsx src/scripts/setup-google-auth.ts",
+    "cli": "tsx src/cli.ts",
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "google-auth-library": "^9.15.1",
+    "googleapis": "^144.0.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "open": "^10.1.0",
+    "openai": "^4.84.0",
+    "openweather-apis": "^4.5.0",
+    "zod": "^3.24.2",
+    "zod-to-json-schema": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.17",
+    "@types/node-telegram-bot-api": "^0.64.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
