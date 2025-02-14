@@ -18,6 +18,7 @@ An extensible AI assistant powered by OpenAI's GPT-4o that integrates with Googl
 - 🌤️ Weather information
 - 🔍 Internet search capabilities
 - ➗ Basic calculations
+- 🌐 Language translation
 - CLI interface for testing
 
 ## Architecture
@@ -161,6 +162,11 @@ pnpm run start
 - Basic operations: create, read, update, delete
 - Directory management and file organization
 - File search and metadata retrieval
+
+### Translation Agent
+- Automatic source language detection and translation
+- Format-preserving multilingual support
+- Optimized for accuracy and consistency
 
 ## Contributing
 
