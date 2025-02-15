@@ -170,15 +170,33 @@ export class FileManagementAgent extends BaseOpenAIAgent {
     const sourcePath = path.join(this.scratchpadPath, source);
     const destPath = path.join(this.scratchpadPath, destination);
     
-    // Ensure destination directory exists
+    // Ensure paths are within scratchpad
+    const resolvedSourcePath = path.resolve(sourcePath);
+    const resolvedDestPath = path.resolve(destPath);
+    if (!resolvedSourcePath.startsWith(this.scratchpadPath) || 
+        !resolvedDestPath.startsWith(this.scratchpadPath)) {
+      throw new Error('Cannot move files outside of scratchpad directory');
+    }
+
+    // Create destination directory if it doesn't exist
     await fs.mkdir(path.dirname(destPath), { recursive: true });
     
-    await fs.rename(sourcePath, destPath);
-    return { 
-      success: true, 
-      from: sourcePath,
-      to: destPath 
-    };
+    try {
+      // Check if source exists
+      await fs.access(sourcePath);
+      
+      // Perform the move
+      await fs.rename(sourcePath, destPath);
+      
+      return { 
+        success: true, 
+        from: sourcePath,
+        to: destPath 
+      };
+    } catch (error) {
+      console.error('Move error:', error);
+      throw new Error(`Failed to move ${source} to ${destination}`);
+    }
   }
 
   private async deleteDirectory(args: { dirname: string }) {
