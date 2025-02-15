@@ -35,9 +35,13 @@ async function startCLI() {
 
       try {
         const response = await assistant.process(input);
-        console.log('\nAssistant:', response, '\n');
+        if (response.includes('I encountered an issue:')) {
+          console.log('\n❌ Assistant:', response, '\n');
+        } else {
+          console.log('\n💬 Assistant:', response, '\n');
+        }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('\n❌ Error:', 'Something went wrong. Please try again.', '\n');
       }
 
       promptUser();

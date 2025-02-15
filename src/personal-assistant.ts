@@ -93,34 +93,24 @@ export class PersonalAssistant extends BaseOpenAIAgent {
 
   public async process(input: string): Promise<string> {
     try {
-      const currentDate = new Date().toLocaleString();
+      const response = await this.callAgent(input);
       
-      // Add user message to history
-      this.messageHistory.push({ role: 'user', content: input });
+      if (!response.success && response.error) {
+        // Try to handle common errors
+        switch (response.error.code) {
+          case 'FileNotFoundError':
+            return `I couldn't find that file. Please check if it exists and try again.`;
+          case 'PermissionError':
+            return `I don't have permission to perform that action. Please check your permissions and try again.`;
+          default:
+            return `I encountered an issue: ${response.error.message}. Would you like me to try a different approach?`;
+        }
+      }
 
-      const runner = this.client.beta.chat.completions
-        .runTools({
-          model: 'gpt-4',
-          tools: this.agentTools as AutoParseableTool<any, true>[],
-          messages: [
-            ...this.messageHistory,
-            { 
-              role: 'system', 
-              content: `Current date and time: ${currentDate}`
-            }
-          ],
-        });
-
-      const result = await runner.finalContent();
-      const response = result ?? 'I was unable to process your request.';
-      
-      // Add assistant response to history
-      this.messageHistory.push({ role: 'assistant', content: response });
-      
-      return response;
+      return response.content;
     } catch (error) {
-      console.error('Error in Personal Assistant:', error);
-      return 'I was unable to process your request.';
+      console.error('Error in personal assistant:', error);
+      return "I apologize, but I encountered an unexpected error. Please try rephrasing your request or try again later.";
     }
   }
 

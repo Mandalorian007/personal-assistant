@@ -27,6 +27,16 @@ export type AgentConfig = {
   zodTools: ZodTool<any>[];
 }
 
+export type AgentResponse = {
+  success: boolean;
+  content: string;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+}
+
 export class BaseOpenAIAgent {
   protected client: OpenAI;
   protected config: AgentConfig;
@@ -53,12 +63,24 @@ export class BaseOpenAIAgent {
     };
   }
 
-  public async callAgent(input: string): Promise<string> {
+  public async callAgent(input: string): Promise<AgentResponse> {
     try {
       const tools = this.config.zodTools.map(tool => createTool({
         name: tool.name,
         schema: tool.schema,
-        implementation: (params) => ({ result: tool.implementation(params) })
+        implementation: async (params) => {
+          try {
+            return { result: await tool.implementation(params) };
+          } catch (error) {
+            return {
+              error: {
+                code: error instanceof Error ? error.name : 'TOOL_ERROR',
+                message: error instanceof Error ? error.message : String(error),
+                details: error
+              }
+            };
+          }
+        }
       }));
 
       const runner = this.client.beta.chat.completions
@@ -72,10 +94,21 @@ export class BaseOpenAIAgent {
         });
 
       const result = await runner.finalContent();
-      return result ?? `${this.config.name} was unable to generate a response.`;
+      return {
+        success: true,
+        content: result ?? `${this.config.name} was unable to generate a response.`
+      };
     } catch (error) {
       console.error(`Error in ${this.config.name}:`, error);
-      throw new Error(`${this.config.name} encountered an error: ${error instanceof Error ? error.message : String(error)}`);
+      return {
+        success: false,
+        content: `${this.config.name} encountered an error.`,
+        error: {
+          code: error instanceof Error ? error.name : 'AGENT_ERROR',
+          message: error instanceof Error ? error.message : String(error),
+          details: error
+        }
+      };
     }
   }
 

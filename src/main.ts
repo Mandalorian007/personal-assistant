@@ -114,7 +114,11 @@ bot.on('message', async (msg) => {
         `[Voice Transcription] ${transcription}\n\nNote: This is a transcribed voice message. Please verify any names, dates, or specific details that might have been misheard.`
       );
       
-      await bot.sendMessage(chatId, response);
+      if (response.includes('I encountered an issue:')) {
+        await bot.sendMessage(chatId, `❌ ${response}`);
+      } else {
+        await bot.sendMessage(chatId, response);
+      }
       return;
     }
     
@@ -165,7 +169,7 @@ bot.on('message', async (msg) => {
     console.error('Error processing message:', error);
     await bot.sendMessage(
       chatId,
-      'Sorry, I encountered an error processing your message. Please try again.'
+      '❌ I encountered an unexpected error. Please try again or rephrase your request.'
     );
   }
 });
