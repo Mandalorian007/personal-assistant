@@ -11,6 +11,7 @@ import { InternetSearchAgent } from './agents/internet-search-agent.js';
 import { GoogleDocsAgent } from './agents/google-docs-agent.js';
 import { FileManagementAgent } from './agents/file-management-agent.js';
 import { TranslationAgent } from './agents/translation-agent.js';
+import { z } from 'zod';
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -49,6 +50,12 @@ export class PersonalAssistant extends BaseOpenAIAgent {
         - You communicate clearly and concisely
         - You take initiative to help solve problems
         
+        Available agents and their capabilities:
+        ${agents.map(agent => {
+          const summary = agent.getAgentSummary();
+          return `\n${summary.name}:\n${summary.capabilities.map(cap => `- ${cap.description}`).join('\n')}`;
+        }).join('\n')}
+        
         Before responding, carefully consider:
         1. What is the user really trying to accomplish?
         2. Which agent(s) have the capabilities needed?
@@ -80,7 +87,6 @@ export class PersonalAssistant extends BaseOpenAIAgent {
 
     this.agents = agents;
     this.agentTools = agentTools;
-
     this.messageHistory = [{
       role: 'system',
       content: this.config.systemPrompt
@@ -93,24 +99,46 @@ export class PersonalAssistant extends BaseOpenAIAgent {
 
   public async process(input: string): Promise<string> {
     try {
-      const response = await this.callAgent(input);
-      
-      if (!response.success && response.error) {
-        // Try to handle common errors
-        switch (response.error.code) {
-          case 'FileNotFoundError':
-            return `I couldn't find that file. Please check if it exists and try again.`;
-          case 'PermissionError':
-            return `I don't have permission to perform that action. Please check your permissions and try again.`;
-          default:
-            return `I encountered an issue: ${response.error.message}. Would you like me to try a different approach?`;
-        }
-      }
+      const currentDate = new Date().toLocaleString();
+      this.messageHistory.push({ role: 'user', content: input });
 
-      return response.content;
+      const runner = this.client.beta.chat.completions
+        .runTools({
+          model: 'gpt-4o',
+          tools: this.agentTools as AutoParseableTool<any, true>[],
+          messages: [
+            ...this.messageHistory,
+            { 
+              role: 'system', 
+              content: `Current date and time: ${currentDate}`
+            }
+          ],
+        });
+
+      const result = await runner.finalContent();
+      const response = result ?? 'I was unable to process your request.';
+      
+      this.messageHistory.push({ role: 'assistant', content: response });
+      return response;
     } catch (error) {
       console.error('Error in personal assistant:', error);
-      return "I apologize, but I encountered an unexpected error. Please try rephrasing your request or try again later.";
+      return this.handleError(error instanceof Error ? {
+        code: error.name,
+        message: error.message
+      } : undefined);
+    }
+  }
+
+  private handleError(error?: { code: string; message: string }): string {
+    if (!error) return "I encountered an unexpected issue.";
+    
+    switch (error.code) {
+      case 'FileNotFoundError':
+        return `I couldn't find that file. Please check if it exists and try again.`;
+      case 'PermissionError':
+        return `I don't have permission to perform that action. Please check your permissions and try again.`;
+      default:
+        return `I encountered an issue: ${error.message}. Would you like me to try a different approach?`;
     }
   }
 
