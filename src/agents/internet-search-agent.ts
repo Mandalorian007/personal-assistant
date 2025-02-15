@@ -60,6 +60,8 @@ export class InternetSearchAgent extends BaseOpenAIAgent {
 
       return {
         answer: response.choices[0].message.content,
+        // @ts-ignore
+        citations: response?.citations || [],
         model: 'sonar-pro',
         timestamp: new Date().toISOString()
       };
