@@ -13,15 +13,15 @@ export class FileManagementAgent extends BaseOpenAIAgent {
       {
         name: 'listFiles',
         schema: z.object({
-          pattern: z.string().describe("File pattern to search for (e.g., '*.txt', 'doc/*.pdf')"),
-          recursive: z.boolean().describe("Whether to search recursively in subdirectories"),
+          pattern: z.string().describe("File pattern to search for (e.g., '*.md' for markdown notes, 'research/*.txt' for research text files)"),
+          recursive: z.boolean().describe("Whether to search in subdirectories like 'research/' or 'notes/'"),
         }),
         implementation: async (args) => this.listFiles(args)
       },
       {
         name: 'createFile',
         schema: z.object({
-          filename: z.string().describe("Name of the file to create (including path relative to scratchpad)"),
+          filename: z.string().describe("Name of the file to create (e.g., 'research/api_notes.md', 'notes/meeting_summary.txt')"),
           content: z.string().describe("Content to write to the file"),
         }),
         implementation: async (args) => this.createFile(args)
@@ -29,15 +29,15 @@ export class FileManagementAgent extends BaseOpenAIAgent {
       {
         name: 'readFile',
         schema: z.object({
-          filename: z.string().describe("Name of the file to read (including path relative to scratchpad)"),
+          filename: z.string().describe("Name of the file to read (e.g., 'research/findings.md', 'notes/todo.txt')"),
         }),
         implementation: async (args) => this.readFile(args)
       },
       {
         name: 'updateFile',
         schema: z.object({
-          filename: z.string().describe("Name of the file to update (including path relative to scratchpad)"),
-          content: z.string().describe("New content for the file"),
+          filename: z.string().describe("Name of the file to update (e.g., 'research/progress.md')"),
+          content: z.string().describe("New or additional content for the file"),
         }),
         implementation: async (args) => this.updateFile(args)
       },
@@ -51,7 +51,7 @@ export class FileManagementAgent extends BaseOpenAIAgent {
       {
         name: 'createDirectory',
         schema: z.object({
-          dirname: z.string().describe("Name of the directory to create (relative to scratchpad)"),
+          dirname: z.string().describe("Name of the directory to create (e.g., 'research/project_x', 'notes/meetings')"),
         }),
         implementation: async (args) => this.createDirectory(args)
       },
@@ -65,8 +65,8 @@ export class FileManagementAgent extends BaseOpenAIAgent {
       {
         name: 'moveFile',
         schema: z.object({
-          source: z.string().describe("Source file path (relative to scratchpad)"),
-          destination: z.string().describe("Destination path (relative to scratchpad)"),
+          source: z.string().describe("Current file location (e.g., 'temp_notes.md')"),
+          destination: z.string().describe("New file location (e.g., 'research/completed_notes.md')"),
         }),
         implementation: async (args) => this.moveFile(args)
       },
@@ -81,8 +81,34 @@ export class FileManagementAgent extends BaseOpenAIAgent {
 
     super(client, {
       name: 'File Management',
-      description: 'Manages files in a scratchpad directory with create, read, update, and delete operations',
-      systemPrompt: 'You are a file management assistant that helps organize and manage files in the scratchpad directory.',
+      description: 'Manages notes, research documents, and temporary files in the scratchpad workspace',
+      systemPrompt: `You are a file management assistant that helps organize and manage files in the scratchpad workspace.
+
+      About the Scratchpad:
+      - This is a dedicated workspace for notes, research, and temporary files
+      - Common directories include 'research/', 'notes/', 'temp/', etc.
+      - Markdown (.md) files are preferred for documentation
+      - Files should be organized by topic/project in appropriate subdirectories
+      
+      Best Practices:
+      - Keep related files together in topic-specific directories
+      - Use clear, descriptive filenames
+      - Prefer markdown for documentation and notes
+      - Organize research materials in the 'research/' directory
+      - Keep temporary or in-progress work in 'temp/' or root
+      
+      When handling files:
+      1. Always check if directories exist before creating files
+      2. Use appropriate file extensions (.md for markdown, .txt for plain text)
+      3. Organize files logically by topic/purpose
+      4. Clean up temporary files when they're no longer needed
+      
+      Example directory structure:
+      scratchpad/
+      ├── research/           # In-depth research documents
+      ├── notes/             # Quick notes and summaries
+      ├── temp/              # Temporary working files
+      └── projects/          # Project-specific materials`,
       zodTools
     });
 
