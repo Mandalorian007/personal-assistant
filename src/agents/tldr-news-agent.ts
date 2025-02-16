@@ -31,7 +31,6 @@ export class TLDRNewsAgent extends BaseOpenAIAgent {
           
           const dateString = requestDate.toISOString().split('T')[0];
           const originalDateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-          console.log(`Fetching news for ${dateString}`);
           
           try {
             const response = await fetch(`${this.baseUrl}${dateString}`);
