@@ -19,6 +19,7 @@
     "open": "^10.1.0",
     "openai": "^4.84.0",
     "openweather-apis": "^4.5.0",
+    "telegramify-markdown": "^1.2.2",
     "zod": "^3.24.2",
     "zod-to-json-schema": "^3.24.1"
   },

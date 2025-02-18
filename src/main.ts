@@ -7,6 +7,7 @@ import path from 'path';
 import { pipeline } from 'stream/promises';
 import { createWriteStream } from 'fs';
 import { fileURLToPath } from 'url';
+import telegramifyMarkdown from 'telegramify-markdown'
 
 config();
 
@@ -97,6 +98,25 @@ async function extractDocumentText(filePath: string): Promise<string> {
   return content;
 }
 
+async function sendResponse(chatId: number, response: string, bot: TelegramBot) {
+  try {
+    if (response.includes('I encountered an issue:') || response.includes('❌')) {
+      // Don't format error messages
+      await bot.sendMessage(chatId, response);
+      return;
+    }
+
+    const formattedResponse = telegramifyMarkdown(response, 'escape');
+    await bot.sendMessage(chatId, formattedResponse, {
+      parse_mode: 'MarkdownV2',
+      disable_web_page_preview: true
+    });
+  } catch (formatError) {
+    console.error('Markdown formatting error:', formatError);
+    await bot.sendMessage(chatId, response);
+  }
+}
+
 // Handle messages
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -114,11 +134,7 @@ bot.on('message', async (msg) => {
         `[Voice Transcription] ${transcription}\n\nNote: This is a transcribed voice message. Please verify any names, dates, or specific details that might have been misheard.`
       );
       
-      if (response.includes('I encountered an issue:')) {
-        await bot.sendMessage(chatId, `❌ ${response}`);
-      } else {
-        await bot.sendMessage(chatId, response);
-      }
+      await sendResponse(chatId, response, bot);
       return;
     }
     
@@ -136,7 +152,7 @@ bot.on('message', async (msg) => {
         `[Image Context] ${analysis}\n\nUser's message: ${userMessage}`
       );
       
-      await bot.sendMessage(chatId, response);
+      await sendResponse(chatId, response, bot);
       return;
     }
     
@@ -151,25 +167,26 @@ bot.on('message', async (msg) => {
         `[Document Content] ${content}\n\nUser's message: ${userMessage}`
       );
       
-      await bot.sendMessage(chatId, response);
+      await sendResponse(chatId, response, bot);
       return;
     }
     
     // Handle text messages
     if (msg.text) {
       const response = await assistant.process(msg.text);
-      await bot.sendMessage(chatId, response);
+      await sendResponse(chatId, response, bot);
       return;
     }
     
     // Unsupported message type
-    await bot.sendMessage(chatId, 'Sorry, I can only process text, voice messages, images, and documents.');
+    await sendResponse(chatId, 'Sorry, I can only process text, voice messages, images, and documents.', bot);
     
   } catch (error) {
     console.error('Error processing message:', error);
-    await bot.sendMessage(
+    await sendResponse(
       chatId,
-      '❌ I encountered an unexpected error. Please try again or rephrase your request.'
+      '❌ I encountered an unexpected error. Please try again or rephrase your request.',
+      bot
     );
   }
 });
