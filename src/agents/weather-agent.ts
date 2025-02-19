@@ -111,14 +111,35 @@ export class WeatherAgent extends BaseOpenAIAgent {
     
     return {
       location: location.city || `${location.region}, ${location.country}`,
-      temperature: data.current.temp,
-      feels_like: data.current.feels_like,
-      humidity: data.current.humidity,
-      pressure: data.current.pressure,
+      temperature: {
+        value: data.current.temp,
+        unit: '°F'
+      },
+      feels_like: {
+        value: data.current.feels_like,
+        unit: '°F'
+      },
+      humidity: {
+        value: data.current.humidity,
+        unit: '%'
+      },
+      pressure: {
+        value: data.current.pressure,
+        unit: 'hPa'
+      },
       description: data.current.weather[0].description,
-      windSpeed: data.current.wind_speed,
-      uvi: data.current.uvi,
-      visibility: data.current.visibility
+      windSpeed: {
+        value: data.current.wind_speed,
+        unit: 'mph'
+      },
+      uvi: {
+        value: data.current.uvi,
+        unit: 'index'
+      },
+      visibility: {
+        value: data.current.visibility,
+        unit: 'meters'
+      }
     };
   }
 
@@ -159,14 +180,32 @@ export class WeatherAgent extends BaseOpenAIAgent {
       forecast: data.daily.slice(0, days).map((day: any) => ({
         date: new Date(day.dt * 1000).toLocaleDateString(),
         temperature: {
-          min: day.temp.min,
-          max: day.temp.max
+          min: {
+            value: day.temp.min,
+            unit: '°F'
+          },
+          max: {
+            value: day.temp.max,
+            unit: '°F'
+          }
         },
-        humidity: day.humidity,
-        pressure: day.pressure,
+        humidity: {
+          value: day.humidity,
+          unit: '%'
+        },
+        pressure: {
+          value: day.pressure,
+          unit: 'hPa'
+        },
         description: day.weather[0].description,
-        windSpeed: day.wind_speed,
-        precipitation: day.pop * 100 // Convert probability to percentage
+        windSpeed: {
+          value: day.wind_speed,
+          unit: 'mph'
+        },
+        precipitation: {
+          value: day.pop * 100,
+          unit: '%'
+        }
       }))
     };
   }
